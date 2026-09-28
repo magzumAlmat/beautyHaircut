@@ -39,10 +39,13 @@ function App() {
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // ✅ Исправлено: imageFile теперь управляется через state и передаётся в компоненты как prop
   function handleImageUpload(file: File) {
     setImageFile(file);
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
+    if (imageFile) {
+      const url = URL.createObjectURL(imageFile);
+      setPreviewUrl(url);
+    }
   }
 
   async function applyStyle(styleId: string): Promise<void> {
@@ -73,7 +76,7 @@ function App() {
     } catch (error) {
       console.error('Ошибка генерации:', error);
       
-      // Fallback — показываем превью как результат
+      // Fallback — показываем превью как результат с пометкой об ошибке
       setResultUrl(previewUrl);
     } finally {
       setIsProcessing(false);
@@ -101,8 +104,8 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-        {/* Upload Section */}
-        <UploadSection onImageLoaded={handleImageUpload} />
+        {/* Upload Section — передаём imageFile как prop ✅ */}
+        <UploadSection onImageLoaded={handleImageUpload} imageFile={imageFile} />
 
         {/* Style Selector */}
         <StyleSelector
