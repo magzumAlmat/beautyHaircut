@@ -3,7 +3,15 @@ import UploadSection from './components/UploadSection';
 import StyleSelector from './components/StyleSelector';
 import PreviewSection from './components/PreviewSection';
 
-const styles = [
+export interface AppStyle {
+  id: string;
+  name: string;
+  subtitle: string;
+  category: 'вечерние' | 'салонные' | 'стрижки';
+  icon: string;
+}
+
+const styles: AppStyle[] = [
   // Вечерние и торжественные прически
   { id: 'hollywood', name: 'Голливудские волны', subtitle: 'Гладкие, крупные, идеально синхронные локоны на одну сторону', category: 'вечерние', icon: 'waves' },
   { id: 'high_bun', name: 'Высокий текстурный пучок', subtitle: 'Элегантная собранная прическа с объемом у корней и легкими прядями у лица', category: 'вечерние', icon: 'bun' },
@@ -19,10 +27,10 @@ const styles = [
   { id: 'straight_hair', name: 'Идеально прямые волосы', subtitle: 'Вытянутые утюжком пряди с глянцевым блеском', category: 'салонные', icon: 'straight' },
 
   // Трендовые стрижки и формы
-  { id: 'bob', name: 'Каре / Боб-каре', subtitle: 'Классическое, боб-каре или с удлинением', category: 'стрижки', icon: 'bob' },
-  { id: 'cascade', name: 'Каскад и Лесенка', subtitle: 'Многоступенчатые стрижки для объема на средние и длинные волосы', category: 'стрижки', icon: 'layers' },
-  { id: 'pixie', name: 'Пикси', subtitle: 'Короткая, динамичная стрижка с рваными прядями', category: 'стрижки', icon: 'short' },
-  { id: 'wolfcut', name: 'Вулфкат (Wolfcut) / Шегги', subtitle: 'Текстурные, намеренно растрепанные многослойные стрижки', category: 'стрижки', icon: 'shaggy' },
+  { id: 'bob', name: 'Каре / Боб-каре', subtitle: 'Классическое, боб-каре или с удлинением', category: 'стрижки' as const, icon: 'bob' },
+  { id: 'cascade', name: 'Каскад и Лесенка', subtitle: 'Многоступенчатые стрижки для объема на средние и длинные волосы', category: 'стрижки' as const, icon: 'layers' },
+  { id: 'pixie', name: 'Пикси', subtitle: 'Короткая, динамичная стрижка с рваными прядями', category: 'стрижки' as const, icon: 'short' },
+  { id: 'wolfcut', name: 'Вулфкат (Wolfcut) / Шегги', subtitle: 'Текстурные, намеренно растрепанные многослойные стрижки', category: 'стрижки' as const, icon: 'shaggy' },
 ];
 
 const categories = [
@@ -45,24 +53,35 @@ function App() {
     setPreviewUrl(url);
   }
 
+  function getBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  }
+
   async function applyStyle(styleId: string): Promise<void> {
     if (!selectedStyle || !imageFile || !previewUrl) return;
 
     setIsProcessing(true);
 
     try {
+      const base64Image = await getBase64(imageFile);
+
       // --- В РЕАЛЬНОМ ПРОЕКТЕ: отправить запрос к backend на Qwen Image 2.1 ---
       // const response = await fetch('/api/generate', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ image: previewUrl, style_id: styleId }),
+      //   body: JSON.stringify({ image: base64Image, style_id: styleId }),
       // });
 
       // --- Здесь пока эмуляция — в реальном проекте раскомментируйте fetch выше ---
       const response = await fetch('http://localhost:8001/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: previewUrl, style_id: styleId }),
+        body: JSON.stringify({ image: base64Image, style_id: styleId }),
       });
 
       if (!response.ok) throw new Error('Failed to generate');
@@ -100,7 +119,7 @@ function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         {/* Upload Section */}
-        <UploadSection onImageLoaded={handleImageUpload} />
+        <UploadSection onImageLoaded={handleImageUpload} imageFile={imageFile} />
 
         {/* Style Selector */}
         <StyleSelector

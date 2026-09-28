@@ -25,33 +25,33 @@ function getIcon(iconName: string, className?: string): JSX.Element {
 
   switch (iconName) {
     case 'waves':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 12c-1.197-.983-2.223-2.258-3-3.707V14h1v-5m0 11h-4l-6-4 6-4v3" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 12 c-1.197 -0.983 -2.223 -2.258 -3 -3.707 V14 h1 v-5 m0 11 h-4 l-6 -4 6 -4 v3" /></svg>;
     case 'bun':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10c2-2 6-2 8 0s2 6 0 8-6 2-8 0-2-6zM4 12a8 8 0 0116 0m-3 0c0 2.5-2 4.5-4 4.5S7 14.5 7 12" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10c2 -2 6 -2 8 0s2 6 0 8 -6 2 -8 0 -2 -6z M4 12a8 8 0 0 1 16 0m-3 0c0 2.5 -2 4.5 -4 4.5S7 14.5 7 12" /></svg>;
     case 'bun_low':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 16c-1-2-2-5-3-7h6s-2 2-3 7m2-8a3 3 0 013 3v2a1 1 0 00-2 0V9.414l-3-3" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 16 c-1 -2 -2 -5 -3 -7 h6 s-2 2 -3 7 m2 -8 a3 3 0 0 1 3 3 v2 a1 1 0 0 0 -2 0 V9.414 l-3 -3" /></svg>;
     case 'braid':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7c-2.21 0-4 1.79-4 4s1.79 4 4 4m6 0c2.21 0 4-1.79 4-4s-1.79-4-4-4m-3 8a3 3 0 100-6 3 3 0 000 6zM5 9h14M5 15h14" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 7 c-2.21 0 -4 1.79 -4 4 s1.79 4 4 4 m6 0 c2.21 0 4 -1.79 4 -4 s-1.79 -4 -4 -4 m-3 8 a3 3 0 1 0 0 -6 a3 3 0 0 0 0 6 z M5 9 h14 M5 15 h14" /></svg>;
     case 'shell':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6c-2.954 0-5.678.843-7.71 2.25a1 1 0 00-.126 1.66l1.26 1.13a1 1 0 001.19.07L10 15v3h4v-3l2.38-2.08a1 1 0 001.19-.07l1.26-1.13a1 1 0 00-.126-1.66C17.678 6.843 14.954 6 12 6z" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6 c-2.954 0 -5.678 0.843 -7.71 2.25 a1 1 0 0 0 -0.126 1.66 l1.26 1.13 a1 1 0 0 0 1.19 0.07 L10 15 v3 h4 v-3 l2.38 -2.08 a1 1 0 0 0 1.19 -0.07 l1.26 -1.13 a1 1 0 0 0 -0.126 -1.66 C17.678 6.843 14.954 6 12 6 z" /></svg>;
     case 'volume':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16 V4 m0 0 L3 8 m4 -4 l4 4 m6 0 v12 m0 0 l4 -4 m-4 4 l-4 -4" /></svg>;
     case 'waves_loose':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8c1.5-2 5-2 6.5 0s3.5 4.5 5 4.5a4.5 4.5 0 00-5-4.5m-9 5c-1.5 2-.5 6 2 7s4-2 4-6" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8 c1.5 -2 5 -2 6.5 0 s3.5 4.5 5 4.5 a4.5 4.5 0 0 0 -5 -4.5 m-9 5 c-1.5 2 -0.5 6 2 7 s4 -2 4 -6" /></svg>;
     case 'gel':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10a3 3 0 013 3v6a3 3 0 01-3 3H7a3 3 0 01-3-3v-6a3 3 0 013-3z" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8 h10 a3 3 0 0 1 3 3 v6 a3 3 0 0 1 -3 3 H7 a3 3 0 0 1 -3 -3 v-6 a3 3 0 0 1 3 -3 z" /></svg>;
     case 'pony':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9a3 3 0 00-3-3 6 6 0 00-6 6 6 6 0 004 5.77l2-2m-4 2l-4 2" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9 a3 3 0 0 0 -3 -3 a6 6 0 0 0 -6 6 a6 6 0 0 0 4 5.77 l2 -2 m-4 2 l-4 2" /></svg>;
     case 'straight':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 8l-4 4m4-4l4 4m-4 4l4-4m4 0V3" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 8 l-4 4 m4 -4 l4 4 m-4 4 l-4 -4 m4 0 V3" /></svg>;
     case 'bob':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 8c2-2 6-2 8 0s3 4 3 7a3 3 0 01-3 3H9a3 3 0 01-3-3c0-3 1-6 3-7z" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 8 c2 -2 6 -2 8 0 s3 4 3 7 a3 3 0 0 1 -3 3 H9 a3 3 0 0 1 -3 -3 c0 -3 1 -6 3 -7 z" /></svg>;
     case 'layers':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h10m-11 6v-3m9 3v-3" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6 h16 M4 10 h16 M4 14 h10 m-11 6 v-3 m9 3 v-3" /></svg>;
     case 'short':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 6h8a3 3 0 013 3v3m-8 4c2.5 0 4.5-1.5 4.5-4V9H7a3 3 0 00-3 3v3" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 6 h8 a3 3 0 0 1 3 3 v3 m-8 4 c2.5 0 4.5 -1.5 4.5 -4 V9 H7 a3 3 0 0 0 -3 3 v3" /></svg>;
     case 'shaggy':
-      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904l-6.778 5.21a2 2 0 00.724 3.436l1.413.909a2 2 0 002.81-.507l3.356-4.14a2 2 0 00-.314-2.65zM15.29 13.56c.81-.634 1.862-.623 2.607.02l.71.68a2 2 0 001.62.6h.135l-5.935 3.145c-1.262.686-2.797-.092-3.14-1.462l-.184-.56z" /></svg>;
+      return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className={iconClass}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904 l-6.778 5.21 a2 2 0 0 0 0.724 3.436 l1.413 0.909 a2 2 0 0 0 2.81 -0.507 l3.356 -4.14 a2 2 0 0 0 -0.314 -2.65 z M15.29 13.56 c0.81 -0.634 1.862 -0.623 2.607 0.02 l0.71 0.68 a2 2 0 0 0 1.62 0.6 h0.135 l-5.935 3.145 c-1.262 0.686 -2.797 -0.092 -3.14 -1.462 l-0.184 -0.56 z" /></svg>;
     default:
       return <span className="text-xl">❓</span>;
   }
