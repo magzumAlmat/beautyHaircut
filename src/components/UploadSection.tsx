@@ -2,9 +2,10 @@ import React, { useRef } from 'react';
 
 interface UploadSectionProps {
   onImageLoaded: (file: File) => void;
+  imageFile: File | null;
 }
 
-export default function UploadSection({ onImageLoaded }: UploadSectionProps) {
+export default function UploadSection({ onImageLoaded, imageFile }: UploadSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -30,8 +31,9 @@ export default function UploadSection({ onImageLoaded }: UploadSectionProps) {
           className="absolute inset-0 opacity-0 cursor-pointer"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file && imageFile === null) onImageLoaded(file);
-            else fileInputRef.current!.value = '';
+            if (file) {
+              onImageLoaded(file);
+            }
           }}
         />
 
@@ -86,5 +88,3 @@ export default function UploadSection({ onImageLoaded }: UploadSectionProps) {
     </section>
   );
 }
-
-const imageFile = undefined as unknown as File | null; // workaround for type inference in component

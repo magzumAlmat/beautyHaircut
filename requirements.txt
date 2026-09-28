@@ -1,4 +1,4 @@
-# Backend — Hair Style Selector API (FastAPI)
+# Backend — Hair Style Selector API (FastAPI + Pillow)
 fastapi==0.112.0
 uvicorn[standard]==0.30.6
 python-multipart==0.0.12
@@ -7,3 +7,7 @@ Pillow==10.4.0
 
 # Для генерации изображений (fallback режим)
 numpy==1.26.4
+
+# Frontend — React + Vite
+react-dom@18.3.1
+vite@5.4.0

@@ -11,7 +11,8 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 import base64
 import os
-from datetime import datetime
+import io
+from datetime import datetime, timezone
 
 
 # ─── Конфигурация ──────────────────────────────
@@ -48,6 +49,16 @@ HAIR_COLORS = {
 # ─── HTTP Handler ──────────────────────────────
 class Handler(http.server.SimpleHTTPRequestHandler):
     
+    def end_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        super().end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.end_headers()
+
     def do_GET(self):
         parsed = urlparse(self.path)
         
@@ -58,8 +69,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({
                 "status": "ok",
                 "service": "Hair Style Selector API",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }).encode())
+            return
         
         elif parsed.path == "/api/styles":
             self.send_response(200)
@@ -67,6 +79,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             styles = [{"id": k, **v} for k, v in STYLES_DATA.items()]
             self.wfile.write(json.dumps(styles).encode())
+            return
         
         elif parsed.path.startswith("/api/download/"):
             filename = parsed.path[len("/api/download/"):]
@@ -80,6 +93,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(data)
             else:
                 self.send_error(404, "Файл не найден")
+            return
         
         elif parsed.path == "/":
             # Главная страница с инструкцией
@@ -104,17 +118,16 @@ Powered by Qwen Image 2.1 • 24 прически • Пепельный цве�
 </p>
 </body></html>"""
             self.send_response(200)
-            self.send_header("Content-Type", "text/html")
+            self.send_header("Content-Type", "text/html; charset=utf-8")
             self.end_headers()
-            self.wfile.write(html.encode())
+            self.wfile.write(html.encode("utf-8"))
+            return
         
         else:
             # Статический контент (frontend)
-            filepath = Path(self.path[1:])  # убрать ведущий /
-            if not filepath.is_absolute():
-                filepath = Path("frontend/dist") / filepath
-        
-        return super().do_GET()
+            if not self.path.startswith("/frontend/dist/"):
+                self.path = "/frontend/dist" + self.path
+            return super().do_GET()
     
     def do_POST(self):
         content_length = int(self.headers.get("Content-Length", 0))
@@ -153,7 +166,7 @@ Powered by Qwen Image 2.1 • 24 прически • Пепельный цве�
             img_data = self._apply_hair_style(img_bytes, style_id, color)
             
             if img_data:
-                timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+                timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
                 filename = f"{style_id}_{color}_{timestamp}.png"
                 output_path = OUTPUT_DIR / filename
                 
@@ -172,8 +185,10 @@ Powered by Qwen Image 2.1 • 24 прически • Пепельный цве�
                     "output_path": str(output_path),
                 }
                 self.wfile.write(json.dumps(result).encode())
+                return
             else:
                 self.send_error(500, "Ошибка обработки изображения")
+                return
         
         elif parsed.path == "/api/generate/image":
             # Альтернативный endpoint — принимает image как файл в multipart/form-data
@@ -203,7 +218,7 @@ Powered by Qwen Image 2.1 • 24 прически • Пепельный цве�
                 img_data = self._apply_hair_style(img_bytes, style_id, color)
                 
                 if img_data:
-                    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+                    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
                     filename = f"{style_id}_{color}_{timestamp}.png"
                     output_path = OUTPUT_DIR / filename
                     
@@ -269,7 +284,9 @@ Powered by Qwen Image 2.1 • 24 прически • Пепельный цве�
                         max(0, min(255, new_b + noise_b))
                     ))
         
-        return result.convert("RGB").tobytes()
+        img_byte_arr = io.BytesIO()
+        result.save(img_byte_arr, format='PNG')
+        return img_byte_arr.getvalue()
 
 
 # ─── Запуск сервера ──────────────────────────────

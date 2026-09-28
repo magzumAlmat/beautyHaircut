@@ -1,101 +1,77 @@
-import React, { useRef } from 'react';
+import React from 'react';
+import type { File as ReactFile } from '../types';
 
-interface UploadSectionProps {
-  onImageLoaded: (file: File) => void;
+interface Props {
+  onImageLoaded: (file: ReactFile) => void;
+  imageFile?: ReactFile | null;
 }
 
-export default function UploadSection({ onImageLoaded }: UploadSectionProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export default function UploadSection({ onImageLoaded, imageFile }: Props) {
+  const [isDragging, setIsDragging] = React.useState(false);
 
   return (
-    <section className="space-y-4">
-      <div>
-        <h2 className="text-xl font-semibold text-white mb-1 flex items-center gap-2">
-          📁 Загрузите фото
-          <span className="text-slate-500 text-sm font-normal ml-auto">JPG, PNG, WEBP</span>
-        </h2>
+    <div className="mb-8">
+      <div className="flex items-center gap-3 mb-4">
+        <span className="p-2 bg-indigo-500/20 rounded-lg text-indigo-300">📷</span>
+        <div>
+          <h2 className="text-xl font-bold text-white">1. Загрузите фото</h2>
+          <p className="text-slate-400 text-sm mt-1">Перетащите изображение сюда или кликните для выбора файла</p>
+        </div>
       </div>
 
-      <label
-        htmlFor="image-upload"
-        className={`group relative flex items-center justify-center gap-3 w-full max-w-md mx-auto h-48 rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden ${
-          props.imageFile ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-white/30 hover:border-pink-400/60 hover:bg-white/5'
-        }`}
-      >
-        <input
-          id="image-upload"
-          type="file"
-          ref={fileInputRef}
-          accept="image/*"
-          className="absolute inset-0 opacity-0 cursor-pointer"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file && !props.imageFile) onImageLoaded(file);
-            else fileInputRef.current!.value = '';
+      {!imageFile && (
+        <label
+          className={`relative flex flex-col items-center justify-center p-12 rounded-3xl border-2 border-dashed transition-all cursor-pointer ${
+            isDragging ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-600 hover:border-slate-500 hover:bg-white/5 bg-white/[0.02]'
+          }`}
+          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+            const file = Array.from(e.dataTransfer.files).find(f => f.type.startsWith('image/'));
+            if (file) handleFile(file);
           }}
-        />
-
-        <div className="text-center pointer-events-none">
-          <span
-            className={`inline-block p-3 rounded-full mb-2 text-xl transition-all ${
-              props.imageFile ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/10 group-hover:bg-pink-400/20'
-            }`}
-          >
-            {props.imageFile ? (
-              <span aria-hidden="true">✓</span>
-            ) : (
-              <>📸 <span className="text-xs align-top ml-1">(кликните или перетащите)</span></>
-            )}
-          </span>
-
-          <p className="text-slate-300 font-medium">
-            {props.imageFile ? (
-              <>✓ {props.imageFile.name.length > 25 ? props.imageFile.name.slice(0, 22) + '...' : props.imageFile.name}</>
-            ) : (
-              'Перетащите фото сюда или кликните для выбора'
-            )}
-          </p>
-
-          <p className="text-slate-500 text-xs mt-1">Максимум 10 MB</p>
-        </div>
-      </label>
-
-      {/* Image Preview */}
-      {props.imageFile && (
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="relative w-full max-w-md mx-auto rounded-xl overflow-hidden cursor-pointer group"
         >
-          <img
-            src={URL.createObjectURL(props.imageFile)}
-            alt="Preview"
-            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <span className="text-white font-medium">🔄 Заменить фото</span>
+          <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
+            const file = Array.from(e.target.files).find(f => f.type.startsWith('image/'));
+            if (file) handleFile(file);
+          }} />
+
+          <div className="text-center">
+            <div className="mb-3 text-5xl animate-pulse-glow">📁</div>
+            <p className="text-slate-200 font-medium mb-1">Перетащите фото сюда или кликните</p>
+            <p className="text-slate-500 text-sm">Поддерживаются JPG, PNG (макс. 10 MB)</p>
+
+            {imageFile?.previewUrl && (
+              <div className="absolute bottom-4 left-4 right-4 flex justify-center animate-bounce-slow">
+                <img src={imageFile.previewUrl!} alt="Preview" className="rounded-lg shadow-xl border border-white/10 max-h-[80px] object-contain bg-black/5" />
+              </div>
+            )}
           </div>
+        </label>
+      )}
+
+      {imageFile && (
+        <div className="flex items-center justify-between p-4 bg-white/[0.03] rounded-xl border border-white/5">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <img src={imageFile.previewUrl} alt="Selected" className="w-12 h-12 rounded-lg object-cover bg-black/40" />
+            <div className="min-w-0">
+              <p className="text-white text-sm font-medium truncate">{imageFile.name}</p>
+              <p className="text-slate-500 text-xs">{(imageFile.size / 1024 / 1024).toFixed(2)} MB</p>
+            </div>
+          </div>
+
+          <button onClick={() => { onImageLoaded({ name: '', previewUrl: null, size: 0 }); }} className="text-slate-500 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-white/5">🗑️</button>
         </div>
       )}
 
-      {/* Error state */}
-      {props.imageFile && props.imageFile.size > 10 * 1024 * 1024 && (
-        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-300">
-          ⚠️ Файл слишком большой. Максимум 10 MB
+      {imageFile && imageFile.isLoading && (
+        <div className="flex items-center gap-3 p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+          <span className="text-xl">⏳</span>
+          <p className="text-slate-300 text-sm">Обработка изображения...</p>
         </div>
       )}
-
-      {/* Подсказка, если не выбрано фото */}
-      {!props.imageFile && (
-        <p className="text-slate-500 text-sm italic pl-2">
-          Пока что ни одного фото не загружено...
-        </p>
-      )}
-    </section>
+    </div>
   );
-}
-
-// --- Props interface for TypeScript type checking ---
-interface UploadSectionProps {
-  onImageLoaded: (file: File) => void;
-  imageFile?: File | null; // ← теперь это prop, а не глобальная переменная
 }
