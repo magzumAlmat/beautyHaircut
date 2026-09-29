@@ -113,9 +113,9 @@ function App() {
           <UploadSection onImageUpload={handleImageUpload} />
 
           <StyleSelector
-            styles={styles.filter((s) => selectedStyle ? s.category === selectedStyle.category : true)}
+            styles={selectedStyle ? styles.filter((s) => s.category === selectedStyle.category) : styles}
             categories={categories}
-            selectedStyle={selectedStyle}
+            selectedStyle={selectedStyle ?? ({} as any)}
             onSelect={(style: Style) => setSelectedStyle(style)}
           />
 

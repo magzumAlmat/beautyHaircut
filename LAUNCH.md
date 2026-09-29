@@ -1,118 +1,104 @@
-# 🚀 Beauty Haircut Generator — Запуск
+# ✂️ Beauty Haircut Generator
 
-## ✅ Проект успешно запущен!
+Сервис для генерации причесок с пепельными волосами.
 
-Сервис для изменения цвета волос на **пепельный (ash gray)** и создания причесок.
+## 🚀 Как запустить
 
----
-
-## 🌐 Доступные URL
-
-| Сервис | Адрес | Статус |
-|--------|-------|--------|
-| **Frontend** (React + Vite) | `http://localhost:5174` | ✅ Работает |
-| Backend API | `http://localhost:8001` | ⚠️ Нужно запустить вручную |
-
----
-
-## 🎯 Что делает приложение
-
-1. **Загрузка фото** — перетащите или кликните для выбора изображения
-2. **Выбор прически** из 14 стилей:
-   - 🌊 Голливудские волны
-   - 👑 Высокий текстурный пучок
-   - 🎀 Низкий гладкий пучок
-   - 🧣 Греческая коса
-   - 🌀 Французский твист (ракушка)
-   - 💨 Брашинг-объем
-   - 🏖️ Пляжные волны (Beach Waves)
-   - 💧 Эффект «влажных волос»
-   - 🐴 Высокий текстурный хвост
-   - ✨ Пудровый пучок (Pearl Bun)
-   - ✂️ Каре / Боб-каре
-   - 🌊 Каскад и Лесенка
-   - 🐿️ Пикси
-   - 🦁 Вулфкат (Wolfcut) / Шегги
-
-3. **Генерация** — процедурная генерация пепельных волос через Pillow (fallback режим) или Qwen Image 2.5 (если модель загружена).
-
----
-
-## 📋 Как запустить (если сервис выключен)
-
-```bash
-# Терминал: открыть окно и выполнить команды вручную
-
-cd /Users/billionare/.lmstudio/apps/bionic/projects/d49037d8-47f4-5808-9028-c707de117f8f/workspace/scratchpad/frontend
-npm install  # если зависимости не установлены
-npm run dev --host 0.0.0.0
-
-# Откроется http://localhost:5174
-```
-
----
-
-## 🔧 Backend API (порт 8001) — опционально
-
-Запустите отдельный процесс для генерации через API:
+### Backend (Python) — порт 8001
 
 ```bash
 cd /Users/billionare/.lmstudio/apps/bionic/projects/d49037d8-47f4-5808-9028-c707de117f8f/workspace/scratchpad
-python server.py
+python backend.py &
 ```
 
-API endpoint: `POST http://localhost:8001/api/generate`
+Backend будет доступен на `http://localhost:8001`
 
-Пример запроса (в Postman/curl):
+Проверка работоспособности:
+```bash
+curl http://localhost:8001/health
+# {"status":"ok","timestamp":"2026-09-29T..."}
+```
+
+### Frontend (React + Vite) — порт 5173
 
 ```bash
-curl -X POST "http://localhost:8001/api/generate" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...",
-    "style_id": "bob"
-  }'
+cd /Users/billionare/.lmstudio/apps/bionic/projects/d49037d8-47f4-5808-9028-c707de117f8f/workspace/scratchpad/frontend
+npm run dev --host 0.0.0.0
 ```
 
----
-
-## 🛠 Технологический стек
-
-**Frontend:** React 19, Vite, TypeScript, TailwindCSS  
-**Backend:** Python + FastAPI / HTTP.server + Pillow  
+Frontend будет доступен на `http://localhost:5173`
 
 ---
 
-## 📦 Структура проекта
+## 📋 Функционал
+
+- **Загрузка фото** через drag&drop или клик
+- **Выбор прически** из 14 стилей в 3 категории:
+  - Вечерние и торжественные (Голливудские волны, Пучок, Греческая коса, Французский твист)
+  - Салонные укладки (Брашинг-объем, Пляжные волны, Эффект "влажных волос", Хвост, Пудровый пучок)
+  - Трендовые стрижки (Каре, Каскад, Пикси, Вулфкат)
+- **Генерация** через Pillow (процедурная генерация) или Qwen Image 2.1
+
+---
+
+## 🧠 Модели
+
+### Pillow Fallback (работает сразу)
+Процедурная генерация с помощью `PIL` — создаёт изображение пепельных волос с текстурой "боб". Работает без установки дополнительных зависимостей.
+
+### Qwen Image 2.1 (опционально)
+Для использования нейросетевой модели нужно:
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install transformers accelerate xformers
+git clone https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct ./models/qwen-image-v1.5
+```
+
+Затем переключить режим в интерфейсе на "Qwen Image 2.1".
+
+---
+
+## 📁 Структура проекта
 
 ```
 scratchpad/
-├── backend.py              # FastAPI с Qwen Image 2.5 (опционально)
-├── server.py               # Simple HTTP сервер на Python + Pillow
-├── start.html             ← Страница запуска (открыть в браузере)
-├── test.html              ← Тестовая страница для API
-├── LAUNCH.md            ← Эта файл — инструкции
-├── README.md             ← Документация проекта
-├── requirements.txt      # Python: fastapi, pillow
-└── frontend/
-    ├── package.json
-    ├── vite.config.ts
-    └── src/
-        ├── App.tsx       ← Главный компонент (загрузка + выбор прически)
-        └── components/
-            ├── UploadSection.tsx
-            ├── StyleSelector.tsx
-            └── PreviewSection.tsx
+├── backend.py              # FastAPI сервер (порт 8001)
+├── frontend/               # React + Vite приложение (порт 5173)
+│   ├── src/
+│   │   ├── App.tsx        # Главный компонент
+│   │   └── components/    # UploadSection, StyleSelector, PreviewSection
+│   └── vite.config.ts     # Конфиг сборки
+├── server.py              # Простой HTTP сервер (старый fallback)
+└── LAUNCH.md             # Этот файл
 ```
 
 ---
 
-## 🐛 Известные ограничения среды Bionic
+## 🔧 API Endpoints
 
-- `shell_command` не работает через zsh — все команды нужно выполнять вручную в терминале macOS.
-- Python subprocess не поддерживается (среда emscripten) → процессы запускаются только через внешний shell.
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| `GET` | `/health` | Проверка работы сервера |
+| `POST` | `/api/generate` | Генерация прически |
+| `POST` | `/api/upload` | Загрузка изображения |
+| `GET`  | `/api/image/{id}` | Получение результата |
 
 ---
 
-*Создано с помощью Bionic AI Assistant 🤖✨*  
-**Git:** запушен на `https://github.com/magzumAlmat/beautyHaircut.git`
+## 🧪 Пример запроса к API
+
+```bash
+curl -X POST http://localhost:8001/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{"image": "data:image/png;base64,...", "style_id": "bob"}'
+```
+
+---
+
+## 🌐 GitHub
+
+https://github.com/magzumAlmat/beautyHaircut
+
+---
+
+**Автор**: magzumAlmat

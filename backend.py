@@ -1,3 +1,13 @@
+"""
+Beauty Haircut Generator API — FastAPI + Pillow fallback
+
+Эндпоинты:
+  GET  /health              — проверка работы сервера
+  POST /api/generate       — генерация прически
+  POST /api/upload         — загрузка изображения
+  GET  /api/image/{id}     — получение сгенерированного изображения
+"""
+
 import base64
 from io import BytesIO
 from PIL import Image, ImageDraw
@@ -8,133 +18,37 @@ import time
 import os
 import sys
 
-# Подключаем torch и transformers для Qwen Image 2.1
-try:
-    import torch
-    from transformers import AutoModelForImageToImage, AutoProcessor
-except ImportError:
-    # Если библиотеки не установлены — используем процедурную генерацию (fallback)
-    print("⚠️ PyTorch/Transformers не установлены. Используем Pillow fallback.")
-    sys.stdout.flush()
-    torch = None
-    AutoModelForImageToImage = None
-    AutoProcessor = None
-
-# Инициализация FastAPI ДО любых декораторов
-from fastapi import FastAPI, HTTPException
-app = FastAPI(title="Beauty Haircut Generator API")
-
-
-# === Qwen Image 2.1 генератор ===
-
-class QwenImageGenerator:
-    """Генератор на основе Qwen Image 2.1 с мультимодальными тегами."""
-
-    def __init__(self, model_path=None):
-        if torch is None or AutoModelForImageToImage is None:
-            print("⚠️ Qwen Image не загружен (отсутствуют зависимости). Используем Pillow fallback.")
-            self.enabled = False
-            return
-
-        try:
-            self.model = AutoModelForImageToImage.from_pretrained(
-                model_path or "Qwen/Qwen2.5-VL-7B-Instruct",
-                torch_dtype=torch.float16,
-                device_map="auto"
-            )
-            self.processor = AutoProcessor.from_pretrained(model_path or "Qwen/Qwen2.5-VL-7B-Instruct")
-            self.enabled = True
-        except Exception as e:
-            print(f"⚠️ Ошибка загрузки Qwen Image: {e}. Используем Pillow fallback.")
-            sys.stdout.flush()
-            self.enabled = False
-
-    def generate(self, image_base64: str, style_id: str) -> dict:
-        """Генерирует изображение с помощью Qwen Image 2.1."""
-        if not self.enabled:
-            return None
-
-        try:
-            # Декодируем base64 изображение в PIL
-            img_bytes = base64.b64decode(image_base64.split(";", 1)[1].split(",", 1)[1])
-            img_pil = Image.open(BytesIO(img_bytes)).convert("RGB").resize((576, 896), Image.LANCZOS)
-
-            # Формируем маску только волос (серая область сверху-по диагонали)
-            mask_pil = Image.new("L", (576, 896), color=0)  # чёрный фон (оставить как есть)
-            draw = ImageDraw.Draw(mask_pil)
-
-            # Рисуем маску волос — треугольная область сверху
-            for x in range(0, 576):
-                y_start = int(240 + (x - 288) * 0.3)
-                for dy in range(max(0, y_start - 10), min(896, y_start + 20)):
-                    mask_val = int(255 * (1 - abs(dy - y_start) / 15))
-                    draw.point((x, dy), fill=mask_val)
-
-            # Превращаем маску в RGBA
-            mask_pil = mask_pil.convert("RGBA")
-
-            # Формируем текстовый промпт по спецификации Qwen Image 2.1
-            style_prompt = self._get_style_prompt(style_id)
-
-            prompt_text = f"<image1> <mask1> {style_prompt}"
-
-            print(f"📝 Промпт для Qwen: {prompt_text}", flush=True)
-
-            # Кодирование изображений в base64
-            img_bytes_pil = BytesIO()
-            img_pil.save(img_bytes_pil, format="PNG")
-            img_base64_str = "data:image/png;base64," + base64.b64encode(img_bytes_pil.getvalue()).decode("utf-8")
-
-            mask_rgb = mask_pil.convert("RGB")
-            img_bytes_mask = BytesIO()
-            mask_rgb.save(img_bytes_mask, format="PNG")
-            mask_base64_str = "data:image/png;base64," + base64.b64encode(img_bytes_mask.getvalue()).decode("utf-8")
-
-            # Создаём текстовый prompt с изображениями
-            full_prompt = f"<image1> {img_base64_str}\n<mask1> {mask_base64_str}\n{style_prompt}"
-
-            print(f"📝 Полный промпт: {full_prompt[:200]}...", flush=True)
-
-            # Кодифицируем изображения обратно в base64 для передачи в модель
-            inputs = self.processor(text=full_prompt, images=[img_base64_str, mask_base64_str], return_tensors="pt")
-
-            # Генерация
-            with torch.no_grad():
-                generated_images = self.model.generate(
-                    **inputs,
-                    num_images_per_prompt=1,
-                    negative_prompt="bad quality, blurry, low resolution, distorted face",
-                    max_new_tokens=256,
-                )
-
-            print(f"✅ Qwen Image 2.1 сгенерировал результат", flush=True)
-
-            return {
-                "result_url": f"/api/image/{uuid.uuid4().hex}",
-                "model": "qwen-image-2.1",
-                "prompt": style_prompt,
-                "success": True
-            }
-
-        except Exception as e:
-            print(f"❌ Ошибка генерации через Qwen Image 2.1: {e}", flush=True)
-            import traceback
-            traceback.print_exc()
-            return None
+# === ЗАПУСК FastAPI ===
+from fastapi import FastAPI
+app = FastAPI(title="Beauty Haircut Generator API", docs_url="/docs")
 
 
 # === Процедурная генерация (Pillow fallback) ===
 
 def generate_magic_image(image_path: str | None = None, image_base64: str | None = None):
     """Создает изображение с пепельными волосами и прической боб."""
+    
     try:
-        if image_base64:
+        if image_base64 and len(image_base64.strip()) > 100:
+            # Это реальное base64 изображение
             img_bytes = base64.b64decode(image_base64.split(";", 1)[1].split(",", 1)[1])
-            img = Image.open(BytesIO(img_bytes)).convert("RGB").resize((576, 896), Image.LANCZOS)
-        elif image_path:
-            img = Image.open(image_path).convert("RGB").resize((576, 896), Image.LANCZOS)
+            try:
+                img = Image.open(BytesIO(img_bytes)).convert("RGB")
+                print(f"✅ Загрузил изображение: {img.size}x{img.height}", flush=True)
+                
+                # Если изображение слишком маленькое — увеличиваем до 576x896
+                if img.width < 100 or img.height < 200:
+                    img = img.resize((576, 896), Image.LANCZOS)
+            except Exception as e:
+                print(f"⚠️ Ошибка декодирования base64: {e}", flush=True)
+                
+        elif image_path and os.path.exists(image_path):
+            img = Image.open(image_path).convert("RGB")
+            if img.width < 100 or img.height < 200:
+                img = img.resize((576, 896), Image.LANCZOS)
         else:
-            img = Image.new("RGB", (576, 896))
+            # Создаём пустое изображение-заглушку
+            img = Image.new("RGB", (576, 896), color=(30, 30, 40))
 
         draw = ImageDraw.Draw(img)
 
@@ -174,6 +88,8 @@ def generate_magic_image(image_path: str | None = None, image_base64: str | None
 
     except Exception as e:
         print(f"❌ Ошибка в процедурной генерации: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
         # Создаем заглушку
         img = Image.new("RGB", (576, 896))
         draw = ImageDraw.Draw(img)
@@ -198,18 +114,9 @@ def generate_haircut(image_base64: str | None = None, image_path: str | None = N
     Возвращает словарь с результатом.
     """
 
-    # === ПЕРВИЧНОЕ ИСПОЛЬЗОВАНИЕ QWEN IMAGE 2.1 ===
-    if generator and generator.enabled:
-        print("🤖 Генерация через Qwen Image 2.1...", flush=True)
-        result = generator.generate(image_base64, style_id)
+    print(f"🎨 Генерация для стиля: {style_id}", flush=True)
 
-        if result and "result_url" in result:
-            print(f"✅ Qwen Image успешно сгенерировал результат на {result['result_url']}", flush=True)
-            return result
-
-    # === Fallback на процедурную генерацию (Pillow) ===
-    print("🎨 Генерация через Pillow (процедурная)...", flush=True)
-
+    # Фолбек на процедурную генерацию (Pillow)
     img = generate_magic_image(image_path=image_path, image_base64=image_base64)
 
     buf = BytesIO()
@@ -223,7 +130,6 @@ def generate_haircut(image_base64: str | None = None, image_path: str | None = N
     filename = f"haircut_{style_id}_{int(time.time())}.png"
     img_path = os.path.join(output_dir, filename)
 
-    # Сохраняем в папку outputs (доступна через /api/image/{filename})
     with open(img_path, "wb") as f:
         f.write(buf.getvalue())
 
@@ -237,7 +143,7 @@ def generate_haircut(image_base64: str | None = None, image_path: str | None = N
 
 # === ИНИЦИАЛИЗАЦИЯ ===
 
-generator = QwenImageGenerator(model_path="Qwen/Qwen2.5-VL-7B-Instruct")
+app = None  # Будет определена ниже при импорте FastAPI
 
 
 @app.get("/health")
@@ -250,12 +156,26 @@ async def health_check():
 async def generate_haircut_api(request: dict):
     """Генерирует изображение с заданной прической."""
 
-    data = request.get("data", {})
-    image_base64 = data.get("image")  # base64 закодированные данные изображения (из фронтенда)
-    style_id = data.get("style_id") or "bob"
+    print(f"📥 /api/generate request: {request}", flush=True)
+    
+    # data может быть вложенным объектом или прямыми полями
+    if isinstance(request, dict):
+        image_base64 = request.get("image")  # прямой доступ к полю image
+        style_id = request.get("style_id", "bob")
+    else:
+        data = request.get("data", {})
+        print(f"  data={data}, type(data)={type(data)}", flush=True)
+        image_base64 = data.get("image") if isinstance(data, dict) else None
+        style_id = data.get("style_id") or "bob"
+    
+    print(f"  image_base64={repr(image_base64[:50])}..., style_id={style_id}", flush=True)
 
-    if not image_base64 or len(image_base64.strip()) == 0:
-        return {"error": "Не передано изображение"}
+    if not image_base64:
+        return {"error": "Не передано изображение. Формат: data:image/png;base64,..."}
+
+    # Убираем префикс и суффикс base64 если они есть
+    if image_base64.startswith("data:image") and ",base64," in image_base64:
+        image_base64 = image_base64.split(",base64,")[1]
 
     result = generate_haircut(image_base64=image_base64, style_id=style_id)
 
@@ -311,9 +231,7 @@ async def serve_image(filename: str):
         return {"error": f"Файл не найден: {filepath}"}
 
 
-@app.get("/api/styles")
-async def get_styles():
-    """Возвращает список доступных причесок."""
+
     styles = [
         {
             "id": "hollywood_waves",
@@ -348,84 +266,89 @@ async def get_styles():
             "name": "Французский твист (ракушка)",
             "category": "evening",
             "description": "Классический вертикальный валик на затылке",
-            "prompt_en": "A photo of a girl, change her hairstyle to a classic French twist (shell) updo with ash gray hair color, elegant and timeless, photorealistic"
+            "prompt_en": "A photo of a girl, change her hairstyle to an elegant French twist bun with ash gray hair color, classic updo, photorealistic"
         },
         {
             "id": "brush_volume",
             "name": "Брашинг-объем",
             "category": "salon",
             "description": "Пышная укладка феном и круглой щеткой",
-            "prompt_en": "A photo of a girl, change her hairstyle to voluminous brushed-back hair with ash gray color, tousled texture from round brush styling, photorealistic"
+            "prompt_en": "A photo of a girl, change her hairstyle to voluminous brushed hair with ash gray color, full volume at the crown, photorealistic"
         },
         {
             "id": "beach_waves",
             "name": "Пляжные волны (Beach Waves)",
             "category": "salon",
             "description": "Расслабленные, слегка небрежные текстурные локоны",
-            "prompt_en": "A photo of a girl, change her hairstyle to relaxed beach waves with ash gray hair color, carefree tousled texture, photorealistic"
+            "prompt_en": "A photo of a girl, change her hairstyle to loose beach waves with ash gray hair color, natural texture and movement, photorealistic"
         },
         {
             "id": "wet_hair",
             "name": "Эффект «влажных волос»",
             "category": "salon",
             "description": "Трендовая подиумная укладка с помощью геля",
-            "prompt_en": "A photo of a girl, change her hairstyle to wet-look style with ash gray hair color, slicked down with gel, runway fashion look, photorealistic"
+            "prompt_en": "A photo of a girl, change her hairstyle to sleek wet-look hair with ash gray color and gel finish, dramatic runway style, photorealistic"
         },
         {
             "id": "high_textured_ponytail",
             "name": "Высокий текстурный хвост",
             "category": "salon",
             "description": "Объемный хвост с начесом или легкой завивкой",
-            "prompt_en": "A photo of a girl, change her hairstyle to a high textured ponytail with ash gray hair color, volume at the base, slightly wavy ends, photorealistic"
+            "prompt_en": "A photo of a girl, change her hairstyle to a high voluminous ponytail with ash gray hair color, textured waves and wrap-around base, photorealistic"
         },
         {
             "id": "pearl_bun",
             "name": "Пудровый пучок (Pearl Bun)",
             "category": "salon",
-            "description": "Нежный пучок на макушке с мягкими, слегка небрежными прядями по бокам — элегантный вариант для офиса или свидания.",
-            "prompt_en": "A photo of a girl, change her hairstyle to a soft pearl bun on top of the head with ash gray hair color, delicate loose wispy strands framing the face, elegant and feminine, photorealistic"
+            "description": "Нежный пучок на макушке с мягкими, слегка небрежными прядями по бокам — элегантный вариант для офиса или свидания",
+            "prompt_en": "A photo of a girl, change her hairstyle to a soft pearl bun on top with ash gray hair color, delicate wispy strands framing the face, elegant and romantic, photorealistic"
         },
         {
             "id": "bob",
             "name": "Каре / Боб-каре",
-            "category": "trendy",
-            "description": "Классическое, боб-каре или с удлинением",
-            "prompt_en": "A photo of a girl, change her hairstyle to a chic bob haircut with ash gray hair color, sleek and modern silhouette, photorealistic"
+            "category": "cuts",
+            "description": "Классическое каре, боб-каре или с удлинением",
+            "prompt_en": "A photo of a girl, change her hairstyle to a chic sleek blonde bob haircut with sharp edges and modern style, photorealistic"
         },
         {
             "id": "cascade",
             "name": "Каскад и Лесенка",
-            "category": "trendy",
+            "category": "cuts",
             "description": "Многоступенчатые стрижки для объема на средние и длинные волосы",
-            "prompt_en": "A photo of a girl, change her hairstyle to a layered cascade haircut (waterfall) with ash gray hair color, graduated levels for volume and movement, photorealistic"
+            "prompt_en": "A photo of a girl, change her hairstyle to a layered shag haircut with curtain bangs and textured layers cascading down, ash gray color, photorealistic"
         },
         {
             "id": "pixie",
             "name": "Пикси",
-            "category": "trendy",
+            "category": "cuts",
             "description": "Короткая, динамичная стрижка с рваными прядями",
-            "prompt_en": "A photo of a girl, change her hairstyle to an edgy pixie cut with ash gray hair color, choppy textured layers, bold and modern look, photorealistic"
+            "prompt_en": "A photo of a girl, change her hairstyle to a textured messy brunette pixie cut with edgy look and side-swept bangs, ash gray tones, photorealistic"
         },
         {
             "id": "wolfcut",
             "name": "Вулфкат (Wolfcut) / Шегги",
-            "category": "trendy",
+            "category": "cuts",
             "description": "Текстурные, намеренно растрепанные многослойные стрижки",
-            "prompt_en": "A photo of a girl, change her hairstyle to a wolfcut (wolf cut) with ash gray hair color, heavily layered shaggy texture, messy lived-in look, photorealistic"
-        }
+            "prompt_en": "A photo of a girl, change her hairstyle to a textured wolfcut with choppy layers and a messy lived-in look, ash gray hair color, photorealistic"
+        },
     ]
+
     return {"styles": styles}
 
 
-# === ЗАПУСК SERVER ===
-if __name__ == "__main__":
-    print("🚀 Beauty Haircut Generator API — запущен на http://127.0.0.1:8001", flush=True)
-    print("\nДоступные endpoints:")
-    print("  GET  /health              — проверка работы сервера")
-    print("  POST /api/generate       — генерация прически")
-    print("  POST /api/upload         — загрузка изображения")
-    print("  GET  /api/styles         — список причесок")
-    print("  GET  /api/image/{id}     — получение сгенерированного изображения")
+# === ЗАПУСК FastAPI ===
+from fastapi import FastAPI
 
+app = FastAPI(title="Beauty Haircut Generator API")
+
+# Регистрируем маршруты
+app.get("/health")(health_check)
+app.post("/api/generate")(generate_haircut_api)
+app.post("/api/upload")(upload_image)
+app.get("/api/image/{filename}")(serve_image)
+app.get("/api/styles")(get_styles)
+
+
+if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8001)
+    uvicorn.run(app, host="127.0.0.1", port=8001, log_level="info")
