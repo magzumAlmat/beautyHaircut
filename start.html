@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Beauty Haircut — Запуск сервиса</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%); color: #eee; min-height: 100vh; margin: 0; }
+        h1 { color: #f472b6; font-size: 28px; margin-bottom: 8px; } .subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(51,65,85,0.5); border-radius: 12px; padding: 20px; margin: 16px 0; transition: all 0.3s; }
+        .card:hover { border-color: #f472b6; box-shadow: 0 8px 32px rgba(244,114,182,0.1); }
+        code { background: #0f172a; padding: 2px 8px; border-radius: 4px; font-size: 85%; color: #93c5fd; font-family: 'Fira Code', Consolas, monospace; }
+        pre { background: #0f172a; padding: 16px; border-radius: 8px; overflow-x: auto; margin: 12px 0; color: #93c5fd; font-size: 13px; line-height: 1.6; border: 1px solid rgba(51,65,85,0.4); }
+        .step { display: flex; align-items: flex-start; gap: 12px; margin: 14px 0; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .step:last-child { border-bottom: none; }
+        .step-num { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; flex-shrink: 0; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
+        .step-title { color: #f472b6; font-weight: 600; margin-bottom: 4px; }
+        .step-desc { color: #94a3b8; font-size: 13px; line-height: 1.5; }
+        button { background: linear-gradient(135deg, #ec4899, #8b5cf6); border: none; padding: 14px 28px; color: white; font-size: 16px; font-weight: 600; border-radius: 10px; cursor: pointer; margin: 8px 4px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 15px rgba(236,72,153,0.25); }
+        button:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 30px rgba(236,72,153,0.4); }
+        button:active { transform: translateY(0) scale(0.98); }
+        .url-box { background: #0f172a; padding: 18px; border-radius: 10px; text-align: center; font-size: 16px; color: #93c5fd; margin: 16px 0; word-break: break-all; border: 1px solid rgba(51,65,85,0.4); }
+        .url-box a { color: #f472b6; text-decoration: none; font-weight: 600; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
+        .style-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 14px; transition: all 0.2s; }
+        .style-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(244,114,182,0.3); transform: translateY(-2px); }
+        .style-name { color: #f472b6; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+        .style-subtitle { color: #94a3b8; font-size: 11px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <h1>🪄 Beauty Haircut Generator — Запуск сервиса</h1>
+    <p class="subtitle">Изменяйте цвет волос на пепельный и создавайте прически с помощью Qwen Image 2.1 или Pillow</p>
+
+    <!-- Карточка: что это -->
+    <div class="card">
+        <h3 style="color:#f472b6;margin-bottom:8px;">📦 Что делает этот сервис:</h3>
+        <ul style="margin-top:0;padding-left:20px;color:#94a3b8;font-size:13px;line-height:1.7;">
+            <li><strong>Загрузка фото</strong> — перетащите или кликните для выбора изображения</li>
+            <li><strong>14 причесок</strong> — голливудские волны, каре, пикси, волфкат и другие</li>
+            <li><strong>Пепельный цвет волос</strong> — процедурная генерация через Pillow (fallback) или Qwen Image 2.1</li>
+        </ul>
+    </div>
+
+    <!-- Карточка: инструкции -->
+    <div class="card">
+        <h3 style="color:#f472b6;margin-bottom:8px;">🚀 Запуск сервиса:</h3>
+
+        <div class="step">
+            <div class="step-num">1</div>
+            <div style="flex:1;">
+                <div class="step-title">Шаг 1 — Откройте этот файл в браузере</div>
+                <p class="step-desc">Вы уже здесь! Отлично 🎉</p>
+                <button onclick="startService()">🚀 ЗАПУСТИТЬ СЕРВИС (npm install + dev)</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">2</div>
+            <div style="flex:1;">
+                <div class="step-title">Шаг 2 — Установка зависимостей (если нужно)</div>
+                <p class="step-desc">Если у вас есть Node.js, выполните:</p>
+<pre><code>cd /Users/billionare/.lmstudio/apps/bionic/projects/d49037d8-47f4-5808-9028-c707de117f8f/workspace/scratchpad/frontend
+npm install</code></pre>
+                <p style="margin-top:6px;color:#64748b;font-size:12px;">(Зависимости уже установлены, если папка node_modules существует)</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">3</div>
+            <div style="flex:1;">
+                <div class="step-title">Шаг 3 — Запуск frontend</div>
+                <p class="step-desc">Запустите:</p>
+<pre><code>cd /Users/billionare/.lmstudio/apps/bionic/projects/d49037d8-47f4-5808-9028-c707de117f8f/workspace/scratchpad/frontend
+npm run dev --host 0.0.0.0</code></pre>
+                <p style="margin-top:6px;color:#64748b;font-size:12px;">Затем откройте <a href="http://localhost:5174" target="_blank">http://localhost:5174</a></p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">4</div>
+            <div style="flex:1;">
+                <div class="step-title">Шаг 4 — Запуск backend (опционально)</div>
+                <p class="step-desc">Отдельно запустите Python сервер:</p>
+<pre><code>cd /Users/billionare/.lmstudio/apps/bionic/projects/d49037d8-47f4-5808-9028-c707de117f8f/workspace/scratchpad
+python server.py</code></pre>
+                <p style="margin-top:6px;color:#64748b;font-size:12px;">Backend слушает на http://localhost:8001 с API для генерации изображений.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Карточка: список причесок -->
+    <div class="card" style="margin-top:24px;">
+        <h3 style="color:#f472b6;margin-bottom:8px;font-size:15px;">✨ Доступные прически:</h3>
+        <div class="grid">
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)">Вечерние</span><div class="style-name">🌊 Голливудские волны</div><div class="style-subtitle">Гладкие, крупные, идеально синхронные локоны на одну сторону</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)">Вечерние</span><div class="style-name">👑 Высокий текстурный пучок</div><div class="style-subtitle">Элегантная собранная прическа с объемом у корней</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)">Вечерние</span><div class="style-name">🎀 Низкий гладкий пучок</div><div class="style-subtitle">Строгий, минималистичный вариант</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)">Вечерние</span><div class="style-name">🧣 Греческая коса</div><div class="style-subtitle">Пышное объемное плетение, плавно переходящее в хвост</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)">Вечерние</span><div class="style-name">🌀 Французский твист (ракушка)</div><div class="style-subtitle">Классический вертикальный валик на затылке</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(34,211,238,0.15);color:#38bdf8;border:1px solid rgba(34,211,238,0.3)">Салонные</span><div class="style-name">💨 Брашинг-объем</div><div class="style-subtitle">Пышная укладка феном и круглой щеткой</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(34,211,238,0.15);color:#38bdf8;border:1px solid rgba(34,211,238,0.3)">Салонные</span><div class="style-name">🏖️ Пляжные волны (Beach Waves)</div><div class="style-subtitle">Расслабленные, слегка небрежные текстурные локоны</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(34,211,238,0.15);color:#38bdf8;border:1px solid rgba(34,211,238,0.3)">Салонные</span><div class="style-name">💧 Эффект «влажных волос»</div><div class="style-subtitle">Трендовая подиумная укладка с помощью геля</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(34,211,238,0.15);color:#38bdf8;border:1px solid rgba(34,211,238,0.3)">Салонные</span><div class="style-name">🐴 Высокий текстурный хвост</div><div class="style-subtitle">Объемный хвост с начесом или легкой завивкой</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(34,211,238,0.15);color:#38bdf8;border:1px solid rgba(34,211,238,0.3)">Салонные</span><div class="style-name">✨ Пудровый пучок (Pearl Bun)</div><div class="style-subtitle">Нежный пучок на макушке с мягкими прядями</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.3)">Стрижки</span><div class="style-name">✂️ Каре / Боб-каре</div><div class="style-subtitle">Классическое каре, боб или с удлинением</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.3)">Стрижки</span><div class="style-name">🌊 Каскад и Лесенка</div><div class="style-subtitle">Многоступенчатые стрижки для объема на средние и длинные волосы</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.3)">Стрижки</span><div class="style-name">🐿️ Пикси</div><div class="style-subtitle">Короткая, динамичная стрижка с рваными прядями</div></div>
+            <div class="style-card"><span class="badge" style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid rgba(251,146,60,0.3)">Стрижки</span><div class="style-name">🦁 Вулфкат (Wolfcut) / Шегги</div><div class="style-subtitle">Текстурные, намеренно растрепанные многослойные стрижки</div></div>
+        </div>
+    </div>
+
+    <!-- Кнопка запуска -->
+    <div style="text-align:center;margin-top:24px;">
+        <button onclick="startService()" id="launchBtn">🚀 ЗАПУСТИТЬ СЕРВИС</button>
+    </div>
+
+    <!-- Статус -->
+    <div id="status" class="card" style="display:none; margin-top:24px;">
+        <h3 style="color:#f472b6;margin-bottom:8px;">⏳ Запуск...</h3>
+        <pre id="log"></pre>
+    </div>
+
+    <!-- Результат -->
+    <div id="result" class="url-box" style="display:none;"></div>
+
+</body>
+</html>

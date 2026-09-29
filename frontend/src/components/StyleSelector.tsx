@@ -37,7 +37,6 @@ export default function StyleSelector({ styles, categories, selectedStyle, onSel
             <span className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider mb-2 ${style.category === 'вечерние' ? 'bg-purple-500/30 text-purple-300 border border-purple-500/30' : style.category === 'салонные' ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-500/30' : 'bg-orange-500/30 text-orange-300 border border-orange-500/30'}`}>{style.category}</span>
             <div className="mb-2">{getStyleIcon(style.id)}</div>
             <p className={`text-white font-medium text-sm line-clamp-1 transition-colors ${selectedStyle?.id === style.id ? 'text-purple-300' : ''}`}>{style.name}</p>
-            <p className="text-slate-500 text-[11px] mt-0.5 line-clamp-2 leading-relaxed opacity-60 group-hover:opacity-100 transition-opacity">{style.desc}</p>
 
             {selectedStyle?.id === style.id && (
               <span className="absolute top-2 right-2 px-1.5 py-0.5 bg-purple-500 text-white text-[9px] font-bold rounded">✓ Выбрано</span>
@@ -53,9 +52,9 @@ export default function StyleSelector({ styles, categories, selectedStyle, onSel
 
 function getStyleIcon(id: string): React.ReactNode {
   const icons: Record<string, React.ReactNode> = {
-    hollywood: <span className="text-2xl">🌊</span>, high_bun: <span className="text-2xl">👑</span>, low_bun: <span className="text-2xl">🎀</span>, greek_braid: <span className="text-2xl">🧣</span>, french_twist: <span className="text-2xl">🌀</span>,
-    blowout: <span className="text-2xl">💨</span>, beach_waves: <span className="text-2xl">🏖️</span>, wet_hair: <span className="text-2xl">💧</span>, high_ponytail: <span className="text-2xl">🐴</span>, straight_hair: <span className="text-2xl">⚡️</span>,
-    bob: <span className="text-2xl">✂️</span>, cascade: <span className="text-2xl">🌊</span>, pixie: <span className="text-2xl">🐿️</span>, wolfcut: <span className="text-2xl">🦁</span>,
+    hollywood_waves: <span className="text-xl">🌊</span>, high_bun: <span className="text-xl">👑</span>, low_bun: <span className="text-xl">🎀</span>, greek_braid: <span className="text-xl">🧣</span>, french_twist: <span className="text-xl">🌀</span>,
+    brush_volume: <span className="text-xl">💨</span>, beach_waves: <span className="text-xl">🏖️</span>, wet_hair: <span className="text-xl">💧</span>, high_textured_ponytail: <span className="text-xl">🐴</span>,
+    pearl_bun: <span className="text-xl">✨</span>, bob: <span className="text-xl">✂️</span>, cascade: <span className="text-xl">🌊</span>, pixie: <span className="text-xl">🐿️</span>, wolfcut: <span className="text-xl">🦁</span>,
   };
   return icons[id] || <span className="text-xl">❓</span>;
 }

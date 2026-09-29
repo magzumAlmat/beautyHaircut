@@ -2,16 +2,17 @@ import React from 'react';
 import type { Style, File as ReactFile } from '../types';
 
 interface Props {
+  imageFile: ReactFile | null;
   previewUrl: string | null;
   resultUrl: string | null;
   isProcessing: boolean;
-  selectedStyle?: { id: string; name: string } | null;
+  selectedStyle?: Style | null;
   onApply: () => void;
   onReset: () => void;
   mode: 'qwen' | 'pillow';
 }
 
-export default function PreviewSection({ previewUrl, resultUrl, isProcessing, selectedStyle, onApply, onReset, mode }: Props) {
+export default function PreviewSection({ imageFile, previewUrl, resultUrl, isProcessing, selectedStyle, onApply, onReset, mode }: Props) {
   return (
     <div className="mb-12">
       <div className="flex items-center gap-3 mb-4">
@@ -55,49 +56,49 @@ export default function PreviewSection({ previewUrl, resultUrl, isProcessing, se
                   <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
                     <div className="text-center text-white">
                       <span className="text-5xl mb-3 animate-pulse">⏳</span>
-                      <p className="font-medium">Генерация прически...</p>
+                      <p>Генерация через Pillow...</p>
                     </div>
                   </div>
                 )}
 
-                {!selectedStyle && !isProcessing && (
-                  <img src={previewUrl} alt="Original" className="max-w-full max-h-[60vh] object-contain" />
+                {!isProcessing && !selectedStyle && (
+                  <span className="text-slate-500 text-sm">Выберите прическу, чтобы увидеть предпросмотр</span>
                 )}
               </div>
             )}
           </div>
 
-          {!resultUrl && (
-            <div className="flex gap-3 mt-4 justify-center">
-              <button onClick={onApply} disabled={!selectedStyle || isProcessing} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${!selectedStyle || isProcessing ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white shadow-lg shadow-purple-900/30 hover:shadow-xl hover:shadow-purple-700/50 transform hover:-translate-y-0.5'}`}>
-                {isProcessing ? <>⏳ Генерируем...</> : selectedStyle ? <>✨ Применить {selectedStyle.name}</> : <span>Выберите прическу</span>}
+          {resultUrl && (
+            <>
+              <button onClick={onReset} className="mt-3 px-6 py-2 rounded-lg bg-slate-800/50 text-slate-400 hover:text-white border border-slate-700 hover:border-purple-500/50 transition-colors text-sm font-medium">
+                Сбросить
               </button>
 
-              <button onClick={onReset} className="px-6 py-3 rounded-xl bg-slate-800/50 text-slate-400 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/50 border border-white/5 transition-all duration-300">Сбросить</button>
-            </div>
-          )}
+              <div className="flex gap-3 mt-3">
+                <button onClick={onApply} disabled={isProcessing} className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium transition-all ${
+                  isProcessing ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : mode === 'qwen' 
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-900/30'
+                    : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/30'
+                }`}>
+                  {isProcessing ? (
+                    <>⏳ Генерация...</>
+                  ) : (
+                    <>Применить прическу</>
+                  )}
+                </button>
 
-          {resultUrl && (
-            <div className="mt-4 flex gap-3 items-center justify-between px-6 py-3 bg-green-500/10 border border-green-500/20 rounded-xl">
-              <span className="text-green-300 text-sm font-medium flex items-center gap-2">✅ Результат сгенерирован!</span>
-              <button onClick={onReset} className="px-4 py-1.5 rounded-lg bg-slate-700/50 hover:bg-red-500/20 hover:text-red-300 text-slate-300 text-xs transition-all">Сбросить</button>
-            </div>
-          )}
+                <button onClick={onReset} className="px-6 py-2.5 rounded-lg bg-slate-800/50 text-slate-400 hover:text-white border border-slate-700 hover:border-purple-500/50 transition-colors text-sm font-medium">
+                  Сбросить
+                </button>
+              </div>
 
-          {resultUrl && (
-            <div className="mt-4 flex items-center justify-between px-6 py-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl">
-              <span className="text-green-300 text-sm font-medium flex items-center gap-2">
-                📥 Скачать результат
-              </span>
-              <a href={resultUrl} download={`haircut-${selectedStyle?.id || 'unknown'}.png`} className="px-4 py-1.5 rounded-lg bg-green-600/80 hover:bg-green-500 text-white text-xs font-medium transition-all flex items-center gap-1">
-                ⬇️ Скачать
-              </a>
-            </div>
+              <p className="text-xs text-slate-500 mt-3">
+                ℹ️ Режим: {mode === 'qwen' ? 'Qwen Image 2.1 (требует модели)' : 'Pillow — процедурная генерация через backend'}
+              </p>
+            </>
           )}
         </>
       )}
-
-      <p className="text-slate-600 text-xs mt-4 text-center">Сервис использует алгоритмы процедурной генерации причесок. Результаты могут отличаться от реальных фото.</p>
     </div>
   );
 }

@@ -1,0 +1,11 @@
+{
+    "model_name": "qwen-image-2.5",
+    "description": "Qwen Image 2.5 — модель для генерации изображений с текстом и сложных визуальных сцен",
+    "type": "image_generation",
+    "provider": "local",
+    "config": {
+        "model_id": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "base_url": "http://localhost:8080/v1",
+        "api_key": "qwen-local-key"
+    }
+}

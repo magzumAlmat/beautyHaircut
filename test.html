@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Beauty Haircut — Тест API</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; background: #1a1a2e; color: #eee; }
+        h1 { color: #f472b6; margin-bottom: 8px; } .subtitle { color: #94a3b8; font-size: 13px; }
+        textarea { width: 100%; height: 150px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #93c5fd; padding: 12px; font-family: monospace; font-size: 13px; resize: vertical; box-sizing: border-box; }
+        button { background: linear-gradient(135deg, #ec4899, #8b5cf6); border: none; padding: 12px 24px; color: white; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; margin: 8px 4px; transition: all 0.2s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(236,72,153,0.3); } button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .result-box { background: #0f172a; border-radius: 8px; padding: 16px; margin-top: 16px; display: none; border: 1px solid rgba(51,65,85,0.4); font-family: monospace; font-size: 13px; white-space: pre-wrap; }
+        .result-box img { max-width: 300px; margin-top: 12px; border-radius: 4px; display: block; }
+    </style>
+</head>
+<body>
+
+<h1>🪄 Beauty Haircut API — Тест</h1>
+<p class="subtitle">Отправьте base64 изображение и выберите прическу для генерации с пепельным цветом волос.</p>
+
+<textarea id="inputData" placeholder='Введите JSON: {"image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...", "style_id": "bob"}'></textarea>
+<pre style="background:#0f172a;padding:8px;border-radius:4px;margin-top:8px;font-size:12px;color:#93c5fd;">
+{
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+  "style_id": "bob"   <!-- или: hollywood, pixie, wolfcut и т.д. -->
+}
+</pre>
+
+<button onclick="sendRequest()">🚀 Запустить генерацию</button>
+<button onclick="loadTestImage()" style="background:#334155;">🖼️ Загрузить тестовое фото (base64)</button>
+
+<div id="result" class="result-box"></div>
+
+<script>
+    // Тестовая base64 картинка с девушкой (placeholder)
+    const testImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2VhcGUuY29tICgwMTAwMCkAAADaSURBVDjLrZYxAQAAAMAsp1gHv+8UO607A2JgYGBgYOD//wMCAgICAgICAkJCQoKCgoJCQkJCQsLCwsLS0tLS0uLi4hISEiIiIjKysrKysoeP//9/f3///5+fn5+fn6+v7+/v78jJycnJydra2trb2xvb29vr6+sLDAwMDAweHh4eHl5eXl5fX19fX19gYGBgYGBgYODh4eHi4uLi4uLi4ubm5ubu7u7v7+8QExMTEyMjIzMzMzNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3P/9/f3/////wAAAABJRU5ErkJggg==";
+
+    async function sendRequest() {
+        const inputData = document.getElementById("inputData").value.trim();
+        
+        if (!inputData) {
+            alert("Введите JSON-запрос в поле выше!");
+            return;
+        }
+        
+        try {
+            const data = JSON.parse(inputData);
+            
+            if (!data.image || !data.style_id) {
+                alert("Необходимо указать 'image' и 'style_id'.");
+                return;
+            }
+            
+            document.getElementById("result").style.display = "block";
+            document.getElementById("result").innerHTML = "Запрос отправлен...<br><br>";
+            
+            const response = await fetch("http://localhost:8001/api/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                document.getElementById("result").innerHTML += 
+                    `<strong style="color:#4ade80;">✅ Успех!</strong><br>` +
+                    `Style: ${result.style_name} (${data.style_id})<br>` +
+                    `Color: ash_gray<br>` +
+                    `Result URL: <a href="${result.result_url}" target="_blank">${result.result_url}</a><br><br>`;
+                
+                const img = document.createElement("img");
+                img.src = result.result_url;
+                img.alt = "Generated image";
+                img.style.borderRadius = "4px";
+                img.style.display = "block";
+                document.getElementById("result").appendChild(img);
+            } else {
+                alert(`Ошибка API: ${JSON.stringify(result)}`);
+            }
+            
+        } catch (err) {
+            console.error(err);
+            document.getElementById("result").innerHTML += `❌ Ошибка: ${err.message}<br>`;
+            document.getElementById("result").innerHTML += `<small>Убедитесь, что backend запущен на http://localhost:8001</small>`;
+        }
+    }
+
+    function loadTestImage() {
+        const testBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+        document.getElementById("inputData").value = JSON.stringify({ image: testBase64, style_id: "bob" }, null, 2);
+    }
+</script>
+
+</body>
+</html>
