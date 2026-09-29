@@ -38,7 +38,10 @@ function App() {
 
   function handleImageUpload(file: File): void {
     setImageFile({ name: file.name, size: file.size });
-    setPreviewUrl(URL.createObjectURL(file));
+    
+    // Создаем URL-превью для отображения в интерфейсе
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
   }
 
   async function applyStyle(style: Style): Promise<void> {
@@ -60,8 +63,16 @@ function App() {
       if (data.error) {
         console.error('Ошибка генерации:', data.error);
         alert('Не удалось сгенерировать изображение. Показан предпросмотр.');
+      } else if (data.image_base64) {
+        // Создаем URL из base64 для отображения в браузере
+        const url = `data:image/png;base64,${data.image_base64}`;
+        setResultUrl(url);
+        alert(`✅ Прическа применена! Результат:\n\nМодель: ${data.model}\nПродулось: ${data.processing_time_ms}ms`);
       } else if (data.result_url) {
         resultUrl = data.result_url;
+        const url = `http://localhost${data.result_url}`;
+        setResultUrl(url);
+        alert(`✅ Прическа применена! Результат:\n\nМодель: ${data.model}\nПродулось: ${data.processing_time_ms}ms`);
       }
 
     } catch (error) {
@@ -113,9 +124,9 @@ function App() {
           <UploadSection onImageUpload={handleImageUpload} />
 
           <StyleSelector
-            styles={selectedStyle ? styles.filter((s) => s.category === selectedStyle.category) : styles}
+            styles={styles}
             categories={categories}
-            selectedStyle={selectedStyle ?? ({} as any)}
+            selectedStyle={selectedStyle}
             onSelect={(style: Style) => setSelectedStyle(style)}
           />
 
@@ -147,19 +158,57 @@ git clone https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct ./models/qwen-image
         <PreviewSection
           imageFile={imageFile}
           previewUrl={previewUrl}
-          selectedStyle={selectedStyle}
           resultUrl={resultUrl}
+          selectedStyle={selectedStyle}
           isProcessing={isProcessing}
-          onApply={() => applyStyle(selectedStyle!)}
-          onReset={handleReset}
-          mode={generationMode}
         />
+
+        {/* Action buttons */}
+        {selectedStyle && (
+          <div className="flex gap-3">
+            <button
+              onClick={() => applyStyle(selectedStyle)}
+              disabled={!previewUrl || isProcessing}
+              className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+                !previewUrl
+                  ? 'bg-slate-800/50 text-slate-500 cursor-not-allowed'
+                  : isProcessing
+                    ? 'bg-purple-900/50 text-purple-400 cursor-wait'
+                    : 'bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 hover:from-pink-500 hover:via-purple-500 hover:to-cyan-500 text-white shadow-lg shadow-purple-900/20'
+              }`}
+            >
+              {isProcessing ? (
+                <span className="flex items-center justify-center gap-2">
+                  ⏳ Генерация прически...
+                </span>
+              ) : (
+                '✨ Применить прическу'
+              )}
+            </button>
+
+            {resultUrl && (
+              <>
+                <button
+                  onClick={handleDownload}
+                  className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors shadow-lg shadow-blue-900/20"
+                >
+                  ⬇️ Скачать результат
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
+                >
+                  🔄 Сбросить
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </main>
 
-      <footer className="border-t border-white/10 mt-8">
-        <div className="max-w-7xl mx-auto px-4 py-6 text-center text-slate-500 text-sm">
-          ✂️ Beauty Haircut Generator — Пепельный боб • 14 причесок • Qwen Image 2.1 Ready
-        </div>
+      {/* Footer */}
+      <footer className="mt-12 text-center text-xs text-slate-600 pb-4">
+        Beauty Haircut Generator — Пепельные волосы • Боб-стрижка • 14 стилей
       </footer>
     </div>
   );

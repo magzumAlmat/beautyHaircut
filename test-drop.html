@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Drag&Drop</title>
+  <style>
+    .drop-zone {
+      border: 2px dashed #6366f1;
+      padding: 40px;
+      text-align: center;
+      background: #eef2ff;
+      cursor: pointer;
+    }
+    .drop-zone.dragover {
+      background: #ddd6fe;
+      border-color: #a855f7;
+    }
+  </style>
+</head>
+<body>
+  <h1>Тест Drag&Drop</h1>
+
+  <div class="drop-zone" id="dropZone">
+    📁 Перетащите фото сюда или кликните для выбора<br/>
+    <input type="file" accept="image/*" style="display:none" onchange="handleFile(this.files[0])">
+  </div>
+
+  <script>
+    const zone = document.getElementById('dropZone');
+    
+    // Клик открывает диалог выбора файла
+    zone.addEventListener('click', () => {
+      zone.querySelector('input').click();
+    });
+
+    // Drag over — предотвращаем дефолтное поведение (открытие файла в браузере)
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.add('dragover');
+    });
+
+    // Drop — обрабатываем файл
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.remove('dragover');
+
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+
+      console.log('Получен файл:', file.name, file.type);
+      
+      // Проверяем что это изображение
+      if (file.type.startsWith('image/')) {
+        alert(`✅ Файл успешно получен: ${file.name}\nРазмер: ${(file.size / 1024).toFixed(1)} KB\nТип: ${file.type}`);
+        
+        const url = URL.createObjectURL(file);
+        document.body.innerHTML += `<br/><img src="${url}" style="max-width:300px;margin-top:10px;"><br/>`;
+      } else {
+        alert('❌ Файл не является изображением');
+      }
+    });
+
+    // Drag leave — убираем highlight
+    zone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.remove('dragover');
+    });
+  </script>
+</body>
+</html>

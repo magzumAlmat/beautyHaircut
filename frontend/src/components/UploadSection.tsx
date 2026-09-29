@@ -1,12 +1,34 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 export default function UploadSection({ onImageUpload }: { onImageUpload: (file: File) => void }) {
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    onImageUpload(file);
+  // Обработка drag&drop
+  function handleDragOver(event: React.DragEvent<HTMLDivElement>): void {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLDivElement>): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const file = event.dataTransfer.files[0];
+    
+    // Если перетащили файл — используем его
+    if (file && file.type.startsWith('image/')) {
+      onImageUpload(file);
+      return;
+    }
+
+    // Иначе открываем диалог выбора файла
+    fileInputRef.current?.click();
+  }
+
+  // Обработка клика по зоне
+  function handleClick(event: React.MouseEvent<HTMLDivElement>): void {
+    event.stopPropagation();
+    fileInputRef.current?.click();
   }
 
   return (
@@ -20,12 +42,9 @@ export default function UploadSection({ onImageUpload }: { onImageUpload: (file:
       </div>
 
       <div
-        onDragOver={(e) => { e.preventDefault(); }}
-        onDrop={(event) => {
-          const file = event.dataTransfer.files[0];
-          if (!file || !file.type.startsWith('image/')) return;
-          onImageUpload(file);
-        }}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
         className="border-2 border-dashed border-slate-600 rounded-xl p-8 text-center cursor-pointer hover:border-pink-500 hover:bg-pink-500/5 transition-all duration-300 group"
       >
         <input
@@ -33,7 +52,14 @@ export default function UploadSection({ onImageUpload }: { onImageUpload: (file:
           type="file"
           accept="image/*"
           className="hidden"
-          onChange={handleFileSelect}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file && file.type.startsWith('image/')) {
+              onImageUpload(file);
+            }
+            // Очищаем input чтобы можно было выбрать тот же файл повторно
+            e.target.value = '';
+          }}
         />
 
         <div className="flex flex-col items-center gap-2">

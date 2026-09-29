@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Beauty Haircut Generator — Тест</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 2rem; background: #1e1e2e; color: white; }
+  .zone { border: 3px dashed #6c5ce7; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s; border-radius: 8px; margin-bottom: 1rem; }
+  .zone:hover, .zone.dragover { background: rgba(108, 92, 231, 0.15); border-color: #a29bfe; }
+  .preview { max-width: 600px; max-height: 400px; border-radius: 8px; margin-top: 1rem; }
+  img.preview { display: block; width: 100%; height: auto; border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<h1>Beauty Haircut Generator — Тест Drag&Drop</h1>
+
+<div class="zone" id="dropZone">
+  <span style="font-size: 3rem;">📁</span>
+  <p>Перетащите фото сюда или кликните для выбора файла</p>
+  <small>(поддерживаются JPG, PNG, WebP)</small>
+  <input type="file" accept="image/*" style="display:none">
+</div>
+
+<div id="preview"></div>
+
+<script>
+const zone = document.getElementById('dropZone');
+
+zone.onclick = function() {
+  const input = this.querySelector('input[type=file]');
+  if (input) input.click();
+};
+
+zone.ondragover = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  this.classList.add('dragover');
+};
+
+zone.ondragleave = function() {
+  this.classList.remove('dragover');
+};
+
+zone.ondrop = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  this.classList.remove('dragover');
+
+  const file = e.dataTransfer.files[0];
+
+  if (!file || !/image\/(png|jpg|jpeg|webp)/i.test(file.type)) {
+    alert('Пожалуйста, выберите изображение (JPG, PNG или WebP)');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const img = document.createElement('img');
+    img.className = 'preview';
+    img.src = event.target.result;
+    
+    // Создаём URL для предпросмотра
+    const url = URL.createObjectURL(file);
+    
+    alert(`✅ Файл загружен:\n  Имя: ${file.name}\n  Размер: ${(file.size/1024).toFixed(1)} KB\n  Тип: ${file.type}`);
+    
+    document.getElementById('preview').innerHTML = 
+      `<p>Предпросмотр:</p><img class="preview" src="${url}" alt="Preview">`;
+  };
+  reader.readAsDataURL(file);
+};
+
+// Также добавляем обработчик на input change для выбора через клик
+zone.querySelector('input[type=file]').onchange = function(e) {
+  const file = e.target.files[0];
+  if (file && /image\/(png|jpg|jpeg|webp)/i.test(file.type)) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      document.getElementById('preview').innerHTML = 
+        `<p>Предпросмотр:</p><img class="preview" src="${event.target.result}" alt="Preview">`;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+</script>
+
+</body>
+</html>
