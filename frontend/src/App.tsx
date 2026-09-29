@@ -39,17 +39,6 @@ function App() {
   function handleImageUpload(file: File): void {
     setImageFile({ name: file.name, size: file.size });
     setPreviewUrl(URL.createObjectURL(file));
-
-    if (file.size > 10 * 1024 * 1024) {
-      alert('Файл слишком большой. Максимальный размер: 10 MB');
-      setImageFile(null); setPreviewUrl(null); return;
-    }
-
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      alert('Поддерживаются только JPG, PNG и WebP');
-      setImageFile(null); setPreviewUrl(null); return;
-    }
   }
 
   async function applyStyle(style: Style): Promise<void> {

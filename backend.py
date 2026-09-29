@@ -254,7 +254,7 @@ async def generate_haircut_api(request: dict):
     image_base64 = data.get("image")  # base64 закодированные данные изображения (из фронтенда)
     style_id = data.get("style_id") or "bob"
 
-    if not image_base64:
+    if not image_base64 or len(image_base64.strip()) == 0:
         return {"error": "Не передано изображение"}
 
     result = generate_haircut(image_base64=image_base64, style_id=style_id)
